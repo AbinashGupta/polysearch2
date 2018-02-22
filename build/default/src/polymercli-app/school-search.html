@@ -1,0 +1,47 @@
+<!-- <script src="https://polygit.org/components/webcomponentsjs/webcomponents-lite.js"></script> --><link rel="import" href="https://polygit.org/polymer+v2.0.0/shadycss+webcomponents+1.0.0/components/polymer/polymer-element.html">
+<link rel="import" href="https://polygit.org/polymer+v2.0.0/shadycss+webcomponents+1.0.0/components/iron-ajax/iron-ajax.html">
+
+<dom-module id="school-search">
+    <template>
+        <p>Search Schools:</p>
+        <input name="search" id="searchInput" on-keyup="{{ onSearchTextChange }}">
+        <br><br>
+        <p>Schools:</p>
+        <template is="dom-repeat" items="[[schools]]">
+            <span>{{item.name}}</span>
+            <span>{{item.area}}</span>
+            <br>
+        </template>
+        <iron-ajax auto="" id="ajaxControl" url="http://localhost:1337/schools" handle-as="json" on-response="handleSchoolResponse" debounce-duration="500">
+        </iron-ajax>
+    </template>
+    <script>
+        class schoolSearch extends Polymer.Element {
+            static get is() {
+                return "school-search";
+            }
+
+            static get config() {
+                return {
+                    properties: {
+                        schools: {
+                            type: Array
+                        }
+                    },
+                    ready: function () {
+                        console.log('Ready');
+                    },
+                    handleSchoolResponse: function (data) {
+                        this.schools = data.detail.response;
+                    },
+                    onSearchTextChange: function (event) {
+                        this.$.ajaxControl.url = "http://localhost:1337/schools?search=" + this.$.searchInput.value;
+                        this.$.ajaxControl.generateRequest();
+                    }
+                }
+            }
+        };
+        
+        customElements.define('school-search', schoolSearch);
+    </script>
+</dom-module>
